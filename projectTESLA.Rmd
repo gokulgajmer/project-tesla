@@ -1,0 +1,195 @@
+---
+title: "TESLA"
+author: "Gokul Gajmer and Mohammad Ebrahim Habib"
+date: "2023-02-02"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+# About data
+**Tesla, Inc.is an American multinational automotive and clean energy company headquartered in Austin, Texas. Tesla designs and manufactures electric vehicles (electric cars and trucks), battery energy storage from home to grid-scale, solar panels and solar roof tiles, and related products and services. Tesla is one of the world's most valuable companies and is, as of 2022, the world's most valuable automaker. In 2021, the company had the most worldwide sales of battery electric vehicles and plug-in electric vehicles, capturing 21% of the battery-electric (purely electric) market and 14% of the plug-in market (which includes plug-in hybrids). Through its subsidiary Tesla Energy, the company develops and is a major installer of photo voltaic systems in the United States. Tesla Energy is also one of the largest global suppliers of battery energy storage systems, with 3.99 gigawatt-hours (GWh) installed in 2021.**
+```{r}
+tesla_data <- read.csv("TSLA.csv")
+```
+**since this data contain more than 3000 rows, here I have selected some part of it for the visualization.But I have done analysis of whole data.**
+**Variables used in the data sets:**
+1. **Date** - Date of stock price
+
+2. **open** - Open dividend stock price time
+
+3. **High** -Stock price time gain time
+
+4. **Low** - Stock price low time
+
+5. **Close** - Stock price close time
+
+6. **Adj Close** - Adj close time of stock
+
+7. **Volume** - Number of share
+```{r}
+head <- head(tesla_data,30)
+head
+```
+**Summary of the data with different heading**
+
+1. Summary for open dividend stock price time.
+```{r}
+summary_open <-summary(tesla_data$Open)
+summary_open
+```
+From the above result we can conclude that the maximum open dividend stock price time was 411.470 whereas the minimum was 1.452. The average of the open dividend stock price time of Tesla company was 61.392. 
+
+2. Summary of High(Stock price time gain time)
+
+```{r}
+summary_high <- summary(tesla_data$High)
+summary_high
+```
+3. Summary low(stock price low time)
+```{r}
+summary_low <- summary(tesla_data$Low)
+summary_low
+```
+4. Summary of close (stock price close time)
+```{r}
+summary_close <- summary(tesla_data$Close)
+summary_close
+```
+5. Summary of volume(number of share)
+```{r}
+summary_volume <- summary(tesla_data$Volume)
+summary_volume
+```
+From the Above summary we can know the maximum number of share that was in market in a day was 914082000 whereas the minimum number was 3594000. Also the average number of share was 96738906.
+
+
+Now, we will round all values of variables to two places after the comma.
+```{r}
+tesla_data$Open <- round(tesla_data$Open,2)
+tesla_data$High <- round(tesla_data$High,2)
+tesla_data$Low <- round(tesla_data$Low,2)
+tesla_data$Close <- round(tesla_data$Close,2)
+tesla_data$Adj.Close <- round(tesla_data$Adj.Close,2)
+tesla_data$Volume <- round(tesla_data$Volume,2)
+```
+After the rounded off the data set looks like the following:
+```{r}
+Only_30 <- head(tesla_data,10)
+Only_30
+```
+
+
+**The important library mush be installed and loaded**
+
+```{r}
+library(tidyverse)
+library(rio)
+library(knitr)
+library(kableExtra)
+```
+
+
+**Correlation between the variables**
+
+```{r}
+cor(tesla_data$Low,tesla_data$Volume, method = "spearman")
+```
+We generally consider correlations above 0.4 to be relatively strong; correlations between 0.2 and 0.4 are moderate, and those below 0.2 are considered weak. When we are studying things that are more easily countable, we expect higher correlations.
+
+
+**Scatter plot for two variable low and the volume.**
+```{r}
+library(ggplot2)
+ggplot(tesla_data)+
+  aes(x = tesla_data$Low, y = tesla_data$Volume)+
+  geom_point(colour = "#0c4c8a") +
+  theme_minimal()
+```
+
+When the volume is growing also the low price is growing, because it means that people on the market are more interested in buying the stock. 
+
+
+```{r}
+plot(tesla_data$Low,tesla_data$Volume)
+```
+
+**Scatter plots for several pairs of variables**
+
+```{r}
+pairs(tesla_data[, c("Low", "Volume", "High")],col= "black")
+```
+The figure indicates that high(Stock price time gain time) and low(stock price low time) seems positively correlated.
+
+**Correlation test**
+Unlike a correlation matrix which indicates the correlation coefficients between some pairs of variables in the sample, a correlation test is used to test whether the correlation (denoted ρ) between 2 variables is significantly different from 0 or not in the population.
+
+Actually, a correlation coefficient different from 0 in the sample does not mean that the correlation is significantly different from 0 in the population. This needs to be tested with a hypothesis test—and known as the correlation test.
+
+The null and alternative hypothesis for the correlation test are as follows:
+
+**$H_0:$ p = 0 (meaning that there is no linear relationship between the two variables)**
+
+**$H_1:$ p ≠ 0(meaning that there is a linear relationship between the two variables)**
+
+
+Via this correlation test, what we are actually testing is whether:
+
+the sample contains sufficient evidence to reject the null hypothesis and conclude that the correlation coefficient does not equal 0, so the relationship exists in the population.
+or on the contrary, the sample does not contain enough evidence that the correlation coefficient does not equal 0, so in this case we do not reject the null hypothesis of no relationship between the variables in the population.
+Note that there are 2 assumptions for this test to be valid:
+
+Here we are testing for two variables High and volume.
+
+**test !**
+```{r}
+test1 <- cor.test(tesla_data$High,tesla_data$Volume)
+test1
+```
+The p-value of the correlation test between these 2 variables is **0.02** At the 5% significance level, we do reject the null hypothesis. Our result is significant statistically, but the correlation is not high, it equals almost to 0. So, we can say that there is no strong relationship between mentioned variables.
+
+
+Now we go for the second test of two variable high and close.
+
+test2
+```{r}
+test2 <- cor.test(tesla_data$High,tesla_data$Open)
+test2
+```
+The correlation between High and Open price is almost equal 1, because those prices must be pretty similar on the market where we do not have a big variability. Looking at value of `p_value` we can say that our result is statistically correct.
+
+
+**More visualization**
+
+
+**Histogram**
+```{r}
+his_Open<- hist(tesla_data$Open, ylab ='Frequancy', xlab = 'Open dividend stock price time',col = "red4" )
+his_close<- hist(tesla_data$Close, ylab = "Frequancy", xlab = "Stock price close time", col = "green4")
+```
+
+**Box plot**
+```{r}
+boxplot(tesla_data$Volume, main = "Boxplot of X", ylab = "Values of X")
+```
+Our box plot shows us that there are a lot of outliers.
+
+```{r}
+boxplot(tesla_data$Close, main = "Boxplot of X", ylab = "Values of X")
+```
+
+**Conclusion**
+
+```{r}
+summary(tesla_data)
+```
+In my project, I checked that different kind of prices for Tesla stock are pretty similar what means that this stock doesn't characterize a big variability. We can say that volume in some days was much more bigger than usually what brought significant increases in general.
+
+**Reference**
+
+1. https://www.kaggle.com/datasets/rajkumarpandey02/tesla-inc-tsla-stock-price?select=TSLA.csv
+2. Maurage, Pierre, Alexandre Heeren, and Mauro Pesenti. 2013.
+3. Correlations in Health Studies.” The Journal of Nutrition 143 (6): 931–33.
+
